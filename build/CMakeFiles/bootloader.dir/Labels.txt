@@ -1,0 +1,13 @@
+# Target labels
+ bootloader
+# Source files and their labels
+D:/workspace/esp-idf-v4.4/VSCode/Scanner/build/CMakeFiles/bootloader
+D:/workspace/esp-idf-v4.4/VSCode/Scanner/build/CMakeFiles/bootloader.rule
+D:/workspace/esp-idf-v4.4/VSCode/Scanner/build/CMakeFiles/bootloader-complete.rule
+D:/workspace/esp-idf-v4.4/VSCode/Scanner/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+D:/workspace/esp-idf-v4.4/VSCode/Scanner/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+D:/workspace/esp-idf-v4.4/VSCode/Scanner/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+D:/workspace/esp-idf-v4.4/VSCode/Scanner/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+D:/workspace/esp-idf-v4.4/VSCode/Scanner/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+D:/workspace/esp-idf-v4.4/VSCode/Scanner/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+D:/workspace/esp-idf-v4.4/VSCode/Scanner/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule
