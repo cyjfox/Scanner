@@ -21,7 +21,7 @@
 #include "hal/dac_types.h"
 #include "driver/dac_common.h"
 #include "sin_generator.h"
-#include "esp_blufi_api.h"
+//include "esp_blufi_api.h"
 /* The examples use WiFi configuration that you can set via project configuration menu
 
    If you'd rather not, just change the below entries to strings with
@@ -147,7 +147,7 @@ void wifi_init_sta(void)
     ESP_ERROR_CHECK(esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, instance_any_id));
     vEventGroupDelete(s_wifi_event_group);
 }
-
+/*
 esp_err_t blufi() {
     //esp_bt_controller_mem_release();
     esp_err_t ret;
@@ -173,7 +173,7 @@ esp_err_t blufi() {
 
     return ESP_OK;
 }
-
+*/
 void app_main(void)
 {
     printf("preparing to run main......\n");
@@ -205,6 +205,7 @@ void app_main(void)
        //printf("test point2!\n");
        sleep(1);
        printf("max_amp is : %d\n", max_amp);
+       printf("again!!!\n");
        
     }
 }

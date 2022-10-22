@@ -19,6 +19,10 @@
         "cmath": "c",
         "*.ipp": "c",
         "functional": "c",
-        "math.h": "c"
+        "math.h": "c",
+        "esp_blufi_api.h": "c",
+        "dac_types.h": "c",
+        "event_groups.h": "c",
+        "esp_system.h": "c"
     }
 }
