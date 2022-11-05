@@ -189,7 +189,8 @@ void controllerTask(void * parameter) {
     const char * TAG = "controllerTask";
     while (true) {
         ESP_LOGI(TAG, "running controller task!\n");
-        vTaskDelay(500);
+        //printf("printing : running controller task!\n");
+        vTaskDelay(200);
     }
     /*
     socket udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
@@ -273,7 +274,7 @@ void app_main(void)
     
     TaskHandle_t controllerTaskHandle = NULL;
     //BaseType_t xReturn;
-    xTaskCreate(controllerTask, "ContorllerTask", 4096, NULL, 2, &controllerTaskHandle);
+    xTaskCreate(controllerTask, "ContorllerTask", 8192, NULL, 2, &controllerTaskHandle);
     /*
     if (xReturn != pdPASS) {
         printf("create controller task failed...\n");
@@ -299,6 +300,8 @@ void app_main(void)
        //printf("max_amp is : %d\n", max_amp);
        //printf("again!!!\n");
        //printf("456 Hz\n");
+       UBaseType_t maxStackUsed = uxTaskGetStackHighWaterMark(controllerTaskHandle);
+       printf("max stack used in controller task is : %d\n", maxStackUsed);
        printf("system error!!!\n");
        sleep(1);
        
