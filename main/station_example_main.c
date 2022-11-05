@@ -54,6 +54,8 @@ int max_amp = 0;
 //将正弦波分为255段，每段比前一段大1/255*max_amplitude。这样在变化快的地方采样多，在变化小的地方采样少，能使每个可以检测到的变化都被采样出来
 
 
+esp_netif_ip_info_t ipInfo;
+
 static void event_handler(void* arg, esp_event_base_t event_base,
                                 int32_t event_id, void* event_data)
 {
@@ -70,6 +72,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
         ESP_LOGI(TAG,"connect to the AP fail");
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
+        ipInfo = &event->ip_info;
         ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
         s_retry_num = 0;
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
@@ -174,6 +177,45 @@ esp_err_t blufi() {
     return ESP_OK;
 }
 */
+
+#define SERVER_LISTEN_UDP_PORT 48235
+#define LOCAL_UDP_PORT 48230
+#define MAX_UDP_CONNECT_RETRY 100
+void controllerTask(void * parm) {
+    const char * TAG = "controllerTask";
+    socket udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
+    if (udpSocket < 0) {
+        ESP_LOGI(TAG, "create udp socket failed!\n");
+        close(udpSocket);
+    } else {
+        struct sockaddr_in localAddr;
+        bzero(&localAddr, sizeof(sockaddr_in));
+        localAddr.sin_family = AF_INET;
+        localAddr.sin_port = htons(LOCAL_UDP_PORT);
+        localAddr.sin_addr = htonl(INADDR_ANY);
+
+        uint8_t result = bind(udpSocket, &localAddr, sizeof(localAddr));
+        if (result != 0) {
+            ESP_LOGI(TAG, "bind to udp port failed!!!check if the port is used!!!\n")
+        } else {
+            struct sockaddr_in remoteAddr;
+            bzero(&remoteAddr, sizeof(sockaddr_in));
+            remoteAddr.sin_family = AF_INET;
+            remoteAddr.sin_port = htons(SERVER_LISTEN_UDP_PORT);
+            remoteAddr.sin_addr.s_addr = inet_addr("");
+            setsockopt(udpSocket, )
+
+            int len = 0;
+            char [1024] buf;
+            for (int i == 0; i < MAX_UDP_CONNECT_RETRY; i++) {
+                len = sendto(udpSocket, buf, 1024, 0, remoteAddr, sizeof(remoteAddr));
+            }
+        }
+        
+    }
+
+}
+
 void app_main(void)
 {
     printf("preparing to run main......\n");
@@ -188,10 +230,20 @@ void app_main(void)
     ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
     wifi_init_sta();
     
-    sin_wave_start(DAC_CHANNEL_1, 38.0, 0.0);
-    printf("start sin wave done!\n");
+    //sin_wave_start(DAC_CHANNEL_1, 110.0, 0.0);
+    //printf("start sin wave done!\n");
     //vTaskDelay(1);
     printf("test point!\n");
+
+    xHandler_t controllerTaskHandle = NULL;
+    BaseType_t xReturn;
+    xReturn = xTaskCreate(controllerTask, "Contorller", 256, NULL, 2, &controllerTaskHandle);
+    if (xReturn != pdPass) {
+        printf("create controller task failed...\n");
+    }
+
+    vTaskStartScheduler();
+
     while (true) {
         /*
         dac_output_voltage(DAC_CHANNEL_1, 128);
@@ -203,9 +255,12 @@ void app_main(void)
         */
        //sin_wave(DAC_CHANNEL_1, 85.0);
        //printf("test point2!\n");
+       //sleep(1);
+       //printf("max_amp is : %d\n", max_amp);
+       //printf("again!!!\n");
+       //printf("456 Hz\n");
+       printf("system error!!!\n");
        sleep(1);
-       printf("max_amp is : %d\n", max_amp);
-       printf("again!!!\n");
        
     }
 }
