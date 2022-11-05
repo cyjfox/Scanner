@@ -21,6 +21,7 @@
 #include "hal/dac_types.h"
 #include "driver/dac_common.h"
 #include "sin_generator.h"
+#include "lwip/sockets.h"
 //include "esp_blufi_api.h"
 /* The examples use WiFi configuration that you can set via project configuration menu
 
@@ -43,6 +44,8 @@ static EventGroupHandle_t s_wifi_event_group;
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT      BIT1
 
+
+#define MS_TO_TICK(ms) (ms / portTICK_PERIOD_MS)
 static const char *TAG = "wifi station";
 
 static int s_retry_num = 0;
@@ -182,64 +185,95 @@ esp_err_t blufi() {
 }
 */
 
+//#define SERVER_LISTEN_UDP_PORT 48235
+//#define LOCAL_UDP_PORT 48230
 #define SERVER_LISTEN_UDP_PORT 48235
 #define LOCAL_UDP_PORT 48230
 #define MAX_UDP_CONNECT_RETRY 100
 void controllerTask(void * parameter) {
     const char * TAG = "controllerTask";
-    while (true) {
-        ESP_LOGI(TAG, "running controller task!\n");
-        //printf("printing : running controller task!\n");
-        vTaskDelay(200);
-    }
     /*
-    socket udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
+    while (true) {
+        ESP_LOGI(TAG, "running controller task!\n");//ESP_LOGI版本大概需要1700单位最小堆栈
+        //printf("printing : running controller task!\n");//printf版本大概用700单位堆栈
+        //vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(MS_TO_TICK(1000));
+    }
+    */
+    
+    int udpSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (udpSocket < 0) {
         ESP_LOGI(TAG, "create udp socket failed!\n");
         close(udpSocket);
     } else {
+        ESP_LOGI(TAG, "create udp socket succeeded!\n");
         struct sockaddr_in localAddr;
-        bzero(&localAddr, sizeof(sockaddr_in));
+        bzero(&localAddr, sizeof(struct sockaddr_in));
         localAddr.sin_family = AF_INET;
         localAddr.sin_port = htons(LOCAL_UDP_PORT);
         //localAddr.sin_addr = htonl(INADDR_ANY);
-        localAddr.sin_addr = ipInfo.ip;
-
-        int result = bind(udpSocket, &localAddr, sizeof(localAddr));
+         
+        //即unsigned int a1 =  *(unsigned int *)&((struct in_addr) a2);
+        localAddr.sin_addr.s_addr = *(unsigned int *)&ipInfo.ip;
+        //localAddr.sin_addr.s_addr = inet_addr("192.168.1.4");
+        printf("local ip is %08X\n", localAddr.sin_addr.s_addr);
+        int result = bind(udpSocket, &localAddr, sizeof(struct sockaddr_in));
         if (result != 0) {
-            ESP_LOGI(TAG, "bind to udp port failed!!!check if the port is used!!!\n")
+            ESP_LOGI(TAG, "bind to udp port failed!!!check if the port is used!!!\n");
         } else {
+            ESP_LOGI(TAG, "bind to local ip succeeded!\n");
             int opt = 1;
             result = setsockopt(udpSocket, SOL_SOCKET, SO_BROADCAST, &opt, sizeof(opt));
             if (result < 0) {
                 printf("enable socket broadcast option failed!!!\n");
             } else {
+                ESP_LOGI(TAG, "enable socket broadcast option succeeded!\n");
                 struct sockaddr_in remoteAddr;
-                bzero(&remoteAddr, sizeof(sockaddr_in));
+                bzero(&remoteAddr, sizeof(struct sockaddr_in));
                 remoteAddr.sin_family = AF_INET;
                 remoteAddr.sin_port = htons(SERVER_LISTEN_UDP_PORT);
-                remoteAddr.sin_addr.s_addr = htol(INADDR_BROADCAST);
+                remoteAddr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
                 
 
                 int len = 0;
-                char [1024] sendBuf = "abcdefg";
-                for (int i == 0; i < MAX_UDP_CONNECT_RETRY; i++) {
-                    len = sendto(udpSocket, sendBuf, sizeof(sendBuf), 0, remoteAddr, sizeof(remoteAddr));
+                char sendBuf[1024] = "abcdefg123";
+                int count = 0;
+                bool sendDataSucceeded = false;
+                for (int i = 0; i < MAX_UDP_CONNECT_RETRY; ) {
+                    //count++;
+                    sprintf(sendBuf, "count is %d\n", ++count);
+                    //printf("gonna send upd data!\n");
+                    //printf("udpSocket is %d, sendBuf is %s, length of sendBuf is :%d, pointer to remoteAddr is : %08x, size of remoteAddr is : %d\n", udpSocket, sendBuf, strlen(sendBuf), (unsigned int)&remoteAddr, sizeof(struct sockaddr_in));
+                    len = sendto(udpSocket, &sendBuf, strlen(sendBuf), 0, &remoteAddr, sizeof(struct sockaddr_in));
+                    //printf("udp broadcast done!!!\n");
+                    if (len == -1) {
+                        printf("udp broadcast failed!!!\n");
+                        vTaskDelay(MS_TO_TICK(1000));
+                    } else {
+                        //printf("send udp data succeeded!!!\n");
+                        printf("count is %d, length of data send is : %d, original data length is : %d\n", count, len, strlen(sendBuf));
+                        sendDataSucceeded = true;
+                        //printf("test point2\n");
+                        vTaskDelay(MS_TO_TICK(1000));
+                        //break;
+                    }
                 }
-                if (len == -1) {
-                    printf("udp broadcast failed!!!\n");
-                } else {
-                    printf("length of data send is : %d, original data length is : %d", len, strlen(buf));
-                }
-                while (true) {
+                
+                while (sendDataSucceeded) {
+                    /*
                     len = 0;
-                    char [1024] recvBuf;
+                    char recvBuf[1024];
                     bzero(recvBuf, sizeof(recvBuf));
                     struct sockaddr_in serverAddr;
-                    bzero($severAddr, sizeof(sockaddr_in));
+                    bzero(&serverAddr, sizeof(struct sockaddr_in));
 
-                    len = recvfrom(udpSocket, &recvBuf, sizeof(recvBuf), 0, &serverAddr, sizeof(serverAddr));
-                    printf("receive data : %s, length : %d, server ip : %s\n"), recvBuf, len, IP2STR(serverAddr.s_addr));
+                    len = recvfrom(udpSocket, &recvBuf, sizeof(recvBuf), 0, &serverAddr, sizeof(struct sockaddr_in));
+                    //""IP2STR((ip4_addr_t *)&serverAddr.sin_addr.s_addr)""
+                    //IP2STR((ip4_addr_t *)&serverAddr.sin_addr.s_addr)
+                    printf("receive data : %s, length : %d, server ip : %s\n", recvBuf, len, inet_ntoa(serverAddr.sin_addr.s_addr));
+                    */
+                    printf("test point3!!!\n");
+                    vTaskDelay(MS_TO_TICK(300));
                 }
                 
                 
@@ -249,7 +283,7 @@ void controllerTask(void * parameter) {
         }
         
     }
-    */
+    
 
 }
 
@@ -265,6 +299,7 @@ void app_main(void)
     ESP_ERROR_CHECK(ret);
 
     ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
+    esp_wifi_set_ps(WIFI_PS_NONE);
     wifi_init_sta();
     
     //sin_wave_start(DAC_CHANNEL_1, 110.0, 0.0);
@@ -274,7 +309,9 @@ void app_main(void)
     
     TaskHandle_t controllerTaskHandle = NULL;
     //BaseType_t xReturn;
-    xTaskCreate(controllerTask, "ContorllerTask", 8192, NULL, 2, &controllerTaskHandle);
+    //UBaseType_t maxStack = 8192;
+    UBaseType_t maxStack = 8192;
+    xTaskCreate(controllerTask, "ContorllerTask", maxStack, NULL, 2, &controllerTaskHandle);
     /*
     if (xReturn != pdPASS) {
         printf("create controller task failed...\n");
@@ -300,9 +337,10 @@ void app_main(void)
        //printf("max_amp is : %d\n", max_amp);
        //printf("again!!!\n");
        //printf("456 Hz\n");
-       UBaseType_t maxStackUsed = uxTaskGetStackHighWaterMark(controllerTaskHandle);
-       printf("max stack used in controller task is : %d\n", maxStackUsed);
-       printf("system error!!!\n");
+       UBaseType_t highestWaterLevel = uxTaskGetStackHighWaterMark(controllerTaskHandle);
+       UBaseType_t maxStackUsed = maxStack - highestWaterLevel;
+       //printf("max stack used in controller task is : %d, original stack size : %d, highest water level : %d\n", maxStackUsed, maxStack, highestWaterLevel);
+       //printf("system error!!!\n");
        sleep(1);
        
     }
