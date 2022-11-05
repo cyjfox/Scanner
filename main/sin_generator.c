@@ -138,7 +138,8 @@ esp_err_t sin_wave_start(dac_channel_t channel, double freq, double phase) {
     };
     
     //next_alarm_value = 0;
-    next_alarm_value = 40 * 1000 * 5;//5ms延时后输出第一个数据
+    next_alarm_value = 5 * 0.001 / time_per_tick;//5ms延时后输出第一个数据
+    printf("next_alarm_value to start the timer is : %d\n", (int)next_alarm_value);
     //current_amp = 128;
     esp_err_t result;
     result = timer_init(TIMER_GROUP_0, TIMER_0, &timer_config);
@@ -184,6 +185,13 @@ esp_err_t sin_wave_start(dac_channel_t channel, double freq, double phase) {
         ESP_RETURN_ON_ERROR(result, TAG, "timer_start failed!!!\n");
     }
     return ESP_OK;
+}
+
+
+esp_err_t sin_wave_stop(dac_channel_t channel) {
+    ESP_RETURN_ON_FALSE(channel < DAC_CHANNEL_MAX, ESP_ERR_INVALID_ARG, TAG, "DAC channel error");
+    dac_output_disable(current_channel);
+    return timer_pause(TIMER_GROUP_0, TIMER_0);
 }
 
 //不完美的软件延时版本

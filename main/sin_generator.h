@@ -10,4 +10,6 @@ static const double pi = 3.14159265358979323846264338327950288;
 #endif
 esp_err_t sin_wave_start(dac_channel_t channel, double freq, double phase);
 
+esp_err_t sin_wave_stop(dac_channel_t channel);
+
 esp_err_t sin_wave(dac_channel_t channel, double freq);

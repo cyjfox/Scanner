@@ -72,8 +72,12 @@ static void event_handler(void* arg, esp_event_base_t event_base,
         ESP_LOGI(TAG,"connect to the AP fail");
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
-        ipInfo = &event->ip_info;
+        //ipInfo = &event->ip_info;
+        memcpy(&ipInfo, &event->ip_info, sizeof(esp_netif_ip_info_t));
         ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
+        ESP_LOGI(TAG, "cyjfox copy ip : " IPSTR, IP2STR(&ipInfo.ip));
+        ESP_LOGI(TAG, "cyjfox copy mask : " IPSTR, IP2STR(&ipInfo.netmask));
+        ESP_LOGI(TAG, "cyjfox copy gateway : " IPSTR, IP2STR(&ipInfo.gw));
         s_retry_num = 0;
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
     }
@@ -181,8 +185,13 @@ esp_err_t blufi() {
 #define SERVER_LISTEN_UDP_PORT 48235
 #define LOCAL_UDP_PORT 48230
 #define MAX_UDP_CONNECT_RETRY 100
-void controllerTask(void * parm) {
+void controllerTask(void * parameter) {
     const char * TAG = "controllerTask";
+    while (true) {
+        ESP_LOGI(TAG, "running controller task!\n");
+        vTaskDelay(500);
+    }
+    /*
     socket udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
     if (udpSocket < 0) {
         ESP_LOGI(TAG, "create udp socket failed!\n");
@@ -192,27 +201,54 @@ void controllerTask(void * parm) {
         bzero(&localAddr, sizeof(sockaddr_in));
         localAddr.sin_family = AF_INET;
         localAddr.sin_port = htons(LOCAL_UDP_PORT);
-        localAddr.sin_addr = htonl(INADDR_ANY);
+        //localAddr.sin_addr = htonl(INADDR_ANY);
+        localAddr.sin_addr = ipInfo.ip;
 
-        uint8_t result = bind(udpSocket, &localAddr, sizeof(localAddr));
+        int result = bind(udpSocket, &localAddr, sizeof(localAddr));
         if (result != 0) {
             ESP_LOGI(TAG, "bind to udp port failed!!!check if the port is used!!!\n")
         } else {
-            struct sockaddr_in remoteAddr;
-            bzero(&remoteAddr, sizeof(sockaddr_in));
-            remoteAddr.sin_family = AF_INET;
-            remoteAddr.sin_port = htons(SERVER_LISTEN_UDP_PORT);
-            remoteAddr.sin_addr.s_addr = inet_addr("");
-            setsockopt(udpSocket, )
+            int opt = 1;
+            result = setsockopt(udpSocket, SOL_SOCKET, SO_BROADCAST, &opt, sizeof(opt));
+            if (result < 0) {
+                printf("enable socket broadcast option failed!!!\n");
+            } else {
+                struct sockaddr_in remoteAddr;
+                bzero(&remoteAddr, sizeof(sockaddr_in));
+                remoteAddr.sin_family = AF_INET;
+                remoteAddr.sin_port = htons(SERVER_LISTEN_UDP_PORT);
+                remoteAddr.sin_addr.s_addr = htol(INADDR_BROADCAST);
+                
 
-            int len = 0;
-            char [1024] buf;
-            for (int i == 0; i < MAX_UDP_CONNECT_RETRY; i++) {
-                len = sendto(udpSocket, buf, 1024, 0, remoteAddr, sizeof(remoteAddr));
+                int len = 0;
+                char [1024] sendBuf = "abcdefg";
+                for (int i == 0; i < MAX_UDP_CONNECT_RETRY; i++) {
+                    len = sendto(udpSocket, sendBuf, sizeof(sendBuf), 0, remoteAddr, sizeof(remoteAddr));
+                }
+                if (len == -1) {
+                    printf("udp broadcast failed!!!\n");
+                } else {
+                    printf("length of data send is : %d, original data length is : %d", len, strlen(buf));
+                }
+                while (true) {
+                    len = 0;
+                    char [1024] recvBuf;
+                    bzero(recvBuf, sizeof(recvBuf));
+                    struct sockaddr_in serverAddr;
+                    bzero($severAddr, sizeof(sockaddr_in));
+
+                    len = recvfrom(udpSocket, &recvBuf, sizeof(recvBuf), 0, &serverAddr, sizeof(serverAddr));
+                    printf("receive data : %s, length : %d, server ip : %s\n"), recvBuf, len, IP2STR(serverAddr.s_addr));
+                }
+                
+                
             }
+
+            
         }
         
     }
+    */
 
 }
 
@@ -234,16 +270,20 @@ void app_main(void)
     //printf("start sin wave done!\n");
     //vTaskDelay(1);
     printf("test point!\n");
-
-    xHandler_t controllerTaskHandle = NULL;
-    BaseType_t xReturn;
-    xReturn = xTaskCreate(controllerTask, "Contorller", 256, NULL, 2, &controllerTaskHandle);
-    if (xReturn != pdPass) {
+    
+    TaskHandle_t controllerTaskHandle = NULL;
+    //BaseType_t xReturn;
+    xTaskCreate(controllerTask, "ContorllerTask", 4096, NULL, 2, &controllerTaskHandle);
+    /*
+    if (xReturn != pdPASS) {
         printf("create controller task failed...\n");
+    } else {
+        printf("create controller task succeed...\n");
     }
-
+    */
+    printf("create controller task succeed...\n");
     vTaskStartScheduler();
-
+    
     while (true) {
         /*
         dac_output_voltage(DAC_CHANNEL_1, 128);
