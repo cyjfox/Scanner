@@ -11580,7 +11580,7 @@
                         "name": "ESP_CONSOLE_UART_BAUDRATE",
                         "range": [
                             1200,
-                            4000000
+                            1000000
                         ],
                         "title": "UART console baud rate",
                         "type": "int"

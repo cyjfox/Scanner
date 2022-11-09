@@ -8,7 +8,7 @@
         "interface/ftdi/esp32_devkitj_v1.cfg",
         "target/esp32.cfg"
     ],
-    "idf.portWin": "COM10",
+    "idf.portWin": "COM5",
     "idf.pythonBinPathWin": "C:/Espressif/python_env/idf4.4_py3.8_env/Scripts/python.exe",
     "idf.toolsPathWin": "C:\\Espressif",
     "idf.flashType": "UART",
@@ -23,6 +23,10 @@
         "esp_blufi_api.h": "c",
         "dac_types.h": "c",
         "event_groups.h": "c",
-        "esp_system.h": "c"
+        "esp_system.h": "c",
+        "bitset": "c",
+        "algorithm": "c",
+        "*.tcc": "c",
+        "ostream": "c"
     }
 }
