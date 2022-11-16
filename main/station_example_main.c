@@ -33,6 +33,8 @@
 
 #define EXAMPLE_ESP_WIFI_SSID      "TP-LINK_69CC"
 #define EXAMPLE_ESP_WIFI_PASS      "2253501gongxifacai"
+//#define EXAMPLE_ESP_WIFI_SSID           "30max"
+//#define EXAMPLE_ESP_WIFI_PASS           "2253501fox"
 #define EXAMPLE_ESP_MAXIMUM_RETRY  CONFIG_ESP_MAXIMUM_RETRY
 
 /* FreeRTOS event group to signal when we are connected*/
@@ -46,6 +48,8 @@ static EventGroupHandle_t s_wifi_event_group;
 
 
 #define MS_TO_TICK(ms) (ms / portTICK_PERIOD_MS)
+
+char globalBuf[1024];
 static const char *TAG = "wifi station";
 
 static int s_retry_num = 0;
@@ -184,13 +188,24 @@ esp_err_t blufi() {
     return ESP_OK;
 }
 */
+void debugTask(void * parameter) {
+    while (true) {
+        vTaskGetRunTimeStats((char *)&globalBuf);
+        printf("task status : \n");
+        printf("%s\n", globalBuf);
+        vTaskList((char *)&globalBuf);
+        printf("task list : \n");
+        printf("%s\n", globalBuf);
+        vTaskDelay(MS_TO_TICK(300));
+    }
+}
 
 //#define SERVER_LISTEN_UDP_PORT 48235
 //#define LOCAL_UDP_PORT 48230
 #define SERVER_LISTEN_UDP_PORT 1028
-#define LOCAL_UDP_PORT 1027
-#define SERVER_LISTEN_TCP_PORT 1026
-#define LOCAL_TCP_PORT 1025
+#define LOCAL_UDP_PORT 1025
+#define SERVER_LISTEN_TCP_PORT 1024
+#define LOCAL_TCP_PORT 1021
 #define MAX_UDP_CONNECT_RETRY 100
 void controllerTask(void * parameter) {
     const char * TAG = "controllerTask";
@@ -226,28 +241,38 @@ void controllerTask(void * parameter) {
         localAddr.sin_addr.s_addr = *(unsigned int *)&ipInfo.ip;
         //localAddr.sin_addr.s_addr = inet_addr("192.168.1.4");
         printf("local ip is %08X\n", localAddr.sin_addr.s_addr);
-
-        result = bind(udpSocket, &localAddr, sizeof(struct sockaddr_in));
+        int opt = 1;
+        result = setsockopt(udpSocket, SOL_SOCKET, SO_BROADCAST, &opt, sizeof(opt));
+        
         //result = 0;
         if (result != 0) {
-            ESP_LOGI(TAG, "bind to udp port failed!!!check if the port is used!!!\n");
+            
+            printf("enable socket broadcast option failed!!!\n");
             close(udpSocket);
             vTaskDelay(MS_TO_TICK(500));
         } else {
-            ESP_LOGI(TAG, "bind to local ip succeeded!\n");
-            int opt = 1;
-            result = setsockopt(udpSocket, SOL_SOCKET, SO_BROADCAST, &opt, sizeof(opt));
+            ESP_LOGI(TAG, "enable socket broadcast option succeeded!\n");
+            
+            
+            result = bind(udpSocket, &localAddr, sizeof(struct sockaddr_in));
+            
+            //result = 0;
             if (result < 0) {
-                printf("enable socket broadcast option failed!!!\n");
+                ESP_LOGI(TAG, "bind to udp port failed!!!check if the port is used!!!\n");
+                close(udpSocket);
+                vTaskDelay(MS_TO_TICK(500));
             } else {
-                ESP_LOGI(TAG, "enable socket broadcast option succeeded!\n");
+                ESP_LOGI(TAG, "bind to local ip succeeded!\n");
                 //struct sockaddr_in remoteAddr;
                 bzero(&remoteAddr, sizeof(struct sockaddr_in));
                 remoteAddr.sin_family = AF_INET;
                 remoteAddr.sin_port = htons(SERVER_LISTEN_UDP_PORT);
-                //remoteAddr.sin_addr.s_addr = inet_addr("192.168.1.255");
+                //remoteAddr.sin_addr.s_addr = inet_addr("192.168.1.7");
+                //remoteAddr.sin_addr.s_addr = inet_addr("192.168.1.2");
                 remoteAddr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
-                
+                //remoteAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+                //emoteAddr.sin_addr.s_addr = inet_addr("192.168.1.255");
+                //remoteAddr.sin_addr.s_addr = *(unsigned int *)&ipInfo.gw;
 
                 
                 for (int i = 0; i < MAX_UDP_CONNECT_RETRY; ) {
@@ -257,7 +282,7 @@ void controllerTask(void * parameter) {
                     //printf("udpSocket is %d, sendBuf is %s, length of sendBuf is :%d, pointer to remoteAddr is : %08x, size of remoteAddr is : %d\n", udpSocket, sendBuf, strlen(sendBuf), (unsigned int)&remoteAddr, sizeof(struct sockaddr_in));
                     len = sendto(udpSocket, &sendBuf, strlen(sendBuf), 0, &remoteAddr, sizeof(struct sockaddr_in));
                     //printf("udp broadcast done!!!\n");
-                    if (len == -1) {
+                    if (len < 0) {
                         printf("udp broadcast failed!!!\n");
                         vTaskDelay(MS_TO_TICK(1000));
                     } else {
@@ -266,7 +291,7 @@ void controllerTask(void * parameter) {
                         sendDataSucceeded = true;
                         //printf("test point2\n");
                         //flush();
-                        vTaskDelay(MS_TO_TICK(1000));
+                        vTaskDelay(MS_TO_TICK(500));
                         //break;
                     }
                 }
@@ -381,12 +406,13 @@ void app_main(void)
       ESP_ERROR_CHECK(nvs_flash_erase());
       ret = nvs_flash_init();
     }
-    ESP_ERROR_CHECK(ret);
+    ESP_ERROR_CHECK(ret);      
 
     ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
-    
+    //tcpip_adapter_init();
     wifi_init_sta();
     esp_wifi_set_ps(WIFI_PS_NONE);
+    //wifi_set_broadcast_if(STATIONAP_MODE);
     //sin_wave_start(DAC_CHANNEL_1, 110.0, 0.0);
     //printf("start sin wave done!\n");
     //vTaskDelay(1);
@@ -396,8 +422,10 @@ void app_main(void)
     //BaseType_t xReturn;
     //UBaseType_t maxStack = 8192;
     UBaseType_t maxStack = 8192;
+    //xTaskCreateStatic
     //xTaskCreate(controllerTask, "ContorllerTask", maxStack, NULL, 2, &controllerTaskHandle);
-    xTaskCreatePinnedToCore(controllerTask, "ContorllerTask", maxStack, NULL, 2, &controllerTaskHandle, 1);
+    xTaskCreatePinnedToCore(controllerTask, "ContorllerTask", maxStack, NULL, 3, &controllerTaskHandle, 1);
+    //xTaskCreatePinnedToCore(debugTask, "DebugTask", 4096, NULL, 2, NULL, 1);
     /*
     if (xReturn != pdPASS) {
         printf("create controller task failed...\n");
@@ -408,6 +436,19 @@ void app_main(void)
     printf("create controller task succeed...\n");
     //vTaskStartScheduler();
     
+
+
+    /*
+    while (true) {
+        vTaskGetRunTimeStats((char *)&globalBuf);
+        printf("task status : \n");
+        printf("%s\n", globalBuf);
+        vTaskList((char *)&globalBuf);
+        printf("task list : \n");
+        printf("%s\n", globalBuf);
+        vTaskDelay(MS_TO_TICK(800));
+    }
+    */
     //while (true) {
         /*
         dac_output_voltage(DAC_CHANNEL_1, 128);

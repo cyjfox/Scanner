@@ -27,6 +27,16 @@
         "bitset": "c",
         "algorithm": "c",
         "*.tcc": "c",
-        "ostream": "c"
+        "ostream": "c",
+        "random": "c",
+        "*.inc": "c",
+        "memory": "c",
+        "fstream": "c",
+        "iosfwd": "c",
+        "iostream": "c",
+        "istream": "c",
+        "sstream": "c",
+        "streambuf": "c",
+        "regex": "c"
     }
 }

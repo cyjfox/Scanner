@@ -55,12 +55,16 @@ static void wifi_free(void *h, void* buffer)
 
 static esp_err_t wifi_transmit(void *h, void *buffer, size_t len)
 {
+    //by cyjfox
+    //printf("wifi_transmit!\n");
     wifi_netif_driver_t driver = h;
     return esp_wifi_internal_tx(driver->wifi_if, buffer, len);
 }
 
 static esp_err_t wifi_transmit_wrap(void *h, void *buffer, size_t len, void *netstack_buf)
 {
+    //by cyjfox
+    //printf("wifi_transmit_wrap!\n");
     wifi_netif_driver_t driver = h;
 #if (CONFIG_ESP32_SPIRAM_SUPPORT || CONFIG_ESP32S2_SPIRAM_SUPPORT || CONFIG_ESP32S3_SPIRAM_SUPPORT)
     return esp_wifi_internal_tx_by_ref(driver->wifi_if, buffer, len, netstack_buf);

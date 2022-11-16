@@ -1,0 +1,22 @@
+192.168.1.255 got here to get netif(LWIP_HOOK_ip4_route_src)
+ip_routing!!!
+local ip : 0401a8c0
+dest ip : ff01a8c0
+got netif!udp_sendto_if_chksum!!!
+ip4_output_if: st1
+to output!!!
+type 2:addr is not any or any type value,udp_sendto!!!
+count is 199, length of data send is : 34, original data length is : 34
+directly return from udp_send_to!
+try to get netif!!!
+ip4_route_src!!!
+192.168.1.255 here to get netif
+192.168.1.255 got here to get netif(LWIP_HOOK_ip4_route_src)
+ip_routing!!!
+local ip : 0401a8c0
+dest ip : ff01a8c0
+got netif!udp_sendto_if_chksum!!!
+ip4_output_if: st1
+to output!!!
+type 2:addr is not any or any type value,udp_sendto!!!
+count is 200, length of data send is : 34, original data length is : 34
