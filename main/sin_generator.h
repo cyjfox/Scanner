@@ -1,6 +1,7 @@
 #pragma once
 #include "hal/dac_types.h"
 #include "esp_err.h"
+#include "signal_generator.h"
 
 
 //const double pi = 3.1415926535;

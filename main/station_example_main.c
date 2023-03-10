@@ -203,9 +203,9 @@ void debugTask(void * parameter) {
 //#define SERVER_LISTEN_UDP_PORT 48235
 //#define LOCAL_UDP_PORT 48230
 #define SERVER_LISTEN_UDP_PORT 1028
-#define LOCAL_UDP_PORT 1025
-#define SERVER_LISTEN_TCP_PORT 1024
-#define LOCAL_TCP_PORT 1021
+#define LOCAL_UDP_PORT 1027
+#define SERVER_LISTEN_TCP_PORT 1026
+#define LOCAL_TCP_PORT 1025
 #define MAX_UDP_CONNECT_RETRY 100
 void controllerTask(void * parameter) {
     const char * TAG = "controllerTask";
@@ -273,11 +273,12 @@ void controllerTask(void * parameter) {
                 //remoteAddr.sin_addr.s_addr = htonl(INADDR_ANY);
                 //emoteAddr.sin_addr.s_addr = inet_addr("192.168.1.255");
                 //remoteAddr.sin_addr.s_addr = *(unsigned int *)&ipInfo.gw;
-
+                count = 3;
                 
-                for (int i = 0; i < MAX_UDP_CONNECT_RETRY; ) {
+                //for (int i = 0; i < MAX_UDP_CONNECT_RETRY; ) {
+                for (int i = count; i > 0; i--) {
                     //count++;
-                    sprintf(sendBuf, "count is %d\n", ++count);
+                    sprintf(sendBuf, "preparing to receive, count %d\n", count--);
                     //printf("gonna send upd data!\n");
                     //printf("udpSocket is %d, sendBuf is %s, length of sendBuf is :%d, pointer to remoteAddr is : %08x, size of remoteAddr is : %d\n", udpSocket, sendBuf, strlen(sendBuf), (unsigned int)&remoteAddr, sizeof(struct sockaddr_in));
                     len = sendto(udpSocket, &sendBuf, strlen(sendBuf), 0, &remoteAddr, sizeof(struct sockaddr_in));
@@ -291,35 +292,37 @@ void controllerTask(void * parameter) {
                         sendDataSucceeded = true;
                         //printf("test point2\n");
                         //flush();
-                        vTaskDelay(MS_TO_TICK(500));
+                        vTaskDelay(MS_TO_TICK(1000));
                         //break;
                     }
                 }
                 
                 while (sendDataSucceeded) {
-                    /*
+                    
                     len = 0;
-                    char recvBuf[1024];
-                    printf("size of recvBuf is : %d\n", sizeof(recvBuf));
-                    bzero(&recvBuf, sizeof(recvBuf));
-                    printf("test point2!!!\n");
+                    //char recvBuf[1024];
+                    //printf("size of recvBuf is : %d\n", sizeof(recvBuf));
+                    //bzero(&recvBuf, sizeof(recvBuf));
+                    bzero(&globalBuf, sizeof(globalBuf));
+                    //printf("test point2!!!\n");
                     struct sockaddr_in serverAddr;
                     bzero(&serverAddr, sizeof(struct sockaddr_in));
                     //serverAddr.sin_family = AF_INET;
                     //serverAddr.sin_port = htons(SERVER_LISTEN_UDP_PORT);
                     //serverAddr.sin_addr.s_addr = inet_addr(INADDR_ANY);
                     //serverAddr.sin_addr.s_addr = inet_addr("192.168.1.7");
-                    printf("test point3!!!\n");
+                    //printf("test point3!!!\n");
                     socklen_t socklen = sizeof(struct sockaddr_in);
-                    len = recvfrom(udpSocket, &recvBuf, sizeof(recvBuf), 0, &serverAddr, &socklen);
+                    //len = recvfrom(udpSocket, &recvBuf, sizeof(recvBuf), 0, &serverAddr, &socklen);
+                    len = recvfrom(udpSocket, &globalBuf, sizeof(globalBuf), 0, &serverAddr, &socklen);
                     printf("data received!!!\n");
                     //""IP2STR((ip4_addr_t *)&serverAddr.sin_addr.s_addr)""
                     //IP2STR((ip4_addr_t *)&serverAddr.sin_addr.s_addr)
-                    printf("receive data : %s, length : %d, server ip : %s\n", recvBuf, len, inet_ntoa(serverAddr.sin_addr.s_addr));
+                    //printf("receive data : %s, length : %d, server ip : %s\n", recvBuf, len, inet_ntoa(serverAddr.sin_addr.s_addr));
+                    printf("receive data : %s, length : %d, server ip : %s\n", globalBuf, len, inet_ntoa(serverAddr.sin_addr.s_addr));
                     
-                    
-                    vTaskDelay(MS_TO_TICK(300));
-                    */
+                    //vTaskDelay(MS_TO_TICK(300));
+                    /*
                     //use tcp to test
                     struct sockaddr_in tcpServerAddr;
                     bzero(&tcpServerAddr, sizeof(struct sockaddr_in));
@@ -365,6 +368,7 @@ void controllerTask(void * parameter) {
                                 vTaskDelay(MS_TO_TICK(500));
                             }
                         }
+                        */
                         /*
                         if (0 == (result = connect(tcpSocket, &tcpServerAddr, sizeof(struct sockaddr_in)))) {
                             printf("connect to tcp server succeeded!!!\n");
@@ -380,10 +384,10 @@ void controllerTask(void * parameter) {
                             vTaskDelay(MS_TO_TICK(1000));
                             continue;
                         }
-                        */
+                        
 
                     }
-                    
+                    */
                 }
                 
                 
