@@ -37,6 +37,7 @@
         "istream": "c",
         "sstream": "c",
         "streambuf": "c",
-        "regex": "c"
+        "regex": "c",
+        "signal_generator.h": "c"
     }
 }

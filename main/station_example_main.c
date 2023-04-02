@@ -22,6 +22,8 @@
 #include "driver/dac_common.h"
 #include "sin_generator.h"
 #include "lwip/sockets.h"
+#include "signal_generator.h"
+#include "esp_clk.h"
 //include "esp_blufi_api.h"
 /* The examples use WiFi configuration that you can set via project configuration menu
 
@@ -29,8 +31,15 @@
    the config you want - ie #define EXAMPLE_WIFI_SSID "mywifissid"
 */
 
-
-
+extern uint8_t current_amp;
+extern uint8_t err_code;
+extern uint16_t bbb;
+extern double aaa;
+extern uint32_t phase_count;
+extern double ecgAmplitudeTable[1000];
+extern uint32_t g_k;
+extern uint64_t next_alarm_value;
+int apb_freq;
 #define EXAMPLE_ESP_WIFI_SSID      "TP-LINK_69CC"
 #define EXAMPLE_ESP_WIFI_PASS      "2253501gongxifacai"
 //#define EXAMPLE_ESP_WIFI_SSID           "30max"
@@ -197,6 +206,28 @@ void debugTask(void * parameter) {
         printf("task list : \n");
         printf("%s\n", globalBuf);
         vTaskDelay(MS_TO_TICK(300));
+    }
+}
+
+
+void monitorTask(void * parameter) {
+    while (true) {
+        /*
+        printf("current amp in moniter task is : %d\n", current_amp);
+        printf("err_code is : %d\n", err_code);
+        printf("aaa is : %f\n", aaa);
+        printf("bbb is : %d\n", bbb);
+        
+        printf("index 999 is : %f\n", ecgAmplitudeTable[999]);
+        
+        printf("g_k is : %d\n", g_k);
+        printf("next_alarm_value is : %lld\n", next_alarm_value);
+        printf("apb_freq is : %d\n", apb_freq);
+        */
+        printf("phase_count is : %d\n", phase_count);
+        vTaskDelay(5);
+        //vTaskDelay(MS_TO_TICK(2));
+        //sleep(2);
     }
 }
 
@@ -420,6 +451,8 @@ void app_main(void)
     //sin_wave_start(DAC_CHANNEL_1, 110.0, 0.0);
     //printf("start sin wave done!\n");
     //vTaskDelay(1);
+    apb_freq = esp_clk_apb_freq();
+    
     printf("test point!\n");
     
     TaskHandle_t controllerTaskHandle = NULL;
@@ -428,7 +461,7 @@ void app_main(void)
     UBaseType_t maxStack = 8192;
     //xTaskCreateStatic
     //xTaskCreate(controllerTask, "ContorllerTask", maxStack, NULL, 2, &controllerTaskHandle);
-    xTaskCreatePinnedToCore(controllerTask, "ContorllerTask", maxStack, NULL, 3, &controllerTaskHandle, 1);
+    //xTaskCreatePinnedToCore(controllerTask, "ContorllerTask", maxStack, NULL, 3, &controllerTaskHandle, 1);
     //xTaskCreatePinnedToCore(debugTask, "DebugTask", 4096, NULL, 2, NULL, 1);
     /*
     if (xReturn != pdPASS) {
@@ -437,11 +470,15 @@ void app_main(void)
         printf("create controller task succeed...\n");
     }
     */
+   
     printf("create controller task succeed...\n");
     //vTaskStartScheduler();
-    
+    TaskHandle_t monitorTaskHandle = NULL;
+    //UBaseType_t maxStack = 8192;
+    xTaskCreate(monitorTask, "MonitorTask", maxStack, NULL, 2, &monitorTaskHandle); 
+    uint8_t count_per_min = 60;
 
-
+    signal_start(DAC_CHANNEL_1, 5, 0.0, 0.0, 0.8, count_per_min / 60, &ecgAmplitudeTable);
     /*
     while (true) {
         vTaskGetRunTimeStats((char *)&globalBuf);

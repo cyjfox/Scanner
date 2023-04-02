@@ -2826,10 +2826,7 @@
                                         "help": "BLE maximum connections of bluetooth controller.\nEach connection uses 1KB static DRAM whenever the BT controller is enabled.",
                                         "id": "BTDM_CTRL_BLE_MAX_CONN",
                                         "name": "BTDM_CTRL_BLE_MAX_CONN",
-                                        "range": [
-                                            1,
-                                            9
-                                        ],
+                                        "range": null,
                                         "title": "BLE Max Connections",
                                         "type": "int"
                                     },
@@ -3330,10 +3327,7 @@
                                                 "help": "Maximum number of devices which can be recorded in scan duplicate filter.\nWhen the maximum amount of device in the filter is reached, the cache will be refreshed.",
                                                 "id": "BTDM_SCAN_DUPL_CACHE_SIZE",
                                                 "name": "BTDM_SCAN_DUPL_CACHE_SIZE",
-                                                "range": [
-                                                    10,
-                                                    1000
-                                                ],
+                                                "range": null,
                                                 "title": "Maximum number of devices in scan duplicate filter",
                                                 "type": "int"
                                             },
@@ -3385,10 +3379,7 @@
                                                 "help": "The number of unprocessed advertising report that Bluedroid can save.If you set\n`BTDM_BLE_ADV_REPORT_FLOW_CTRL_NUM` to a small value, this may cause adv packets lost.\nIf you set `BTDM_BLE_ADV_REPORT_FLOW_CTRL_NUM` to a large value, Bluedroid may cache a\nlot of adv packets and this may cause system memory run out. For example, if you set\nit to 50, the maximum memory consumed by host is 35 * 50 bytes. Please set\n`BTDM_BLE_ADV_REPORT_FLOW_CTRL_NUM` according to your system free memory and handle adv\npackets as fast as possible, otherwise it will cause adv packets lost.",
                                                 "id": "BTDM_BLE_ADV_REPORT_FLOW_CTRL_NUM",
                                                 "name": "BTDM_BLE_ADV_REPORT_FLOW_CTRL_NUM",
-                                                "range": [
-                                                    50,
-                                                    1000
-                                                ],
+                                                "range": null,
                                                 "title": "BLE adv report flow control number",
                                                 "type": "int"
                                             },
@@ -3398,10 +3389,7 @@
                                                 "help": "When adv report flow control is enabled, The ADV lost event will be generated when the number\nof ADV packets lost in the controller reaches this threshold. It is better to set a larger value.\nIf you set `BTDM_BLE_ADV_REPORT_DISCARD_THRSHOLD` to a small value or printf every adv lost event, it\nmay cause adv packets lost more.",
                                                 "id": "BTDM_BLE_ADV_REPORT_DISCARD_THRSHOLD",
                                                 "name": "BTDM_BLE_ADV_REPORT_DISCARD_THRSHOLD",
-                                                "range": [
-                                                    1,
-                                                    1000
-                                                ],
+                                                "range": null,
                                                 "title": "BLE adv lost event threshold value",
                                                 "type": "int"
                                             }
@@ -3754,10 +3742,7 @@
                                                 "help": "Maximum GATT Server Profiles Count",
                                                 "id": "BT_GATT_MAX_SR_PROFILES",
                                                 "name": "BT_GATT_MAX_SR_PROFILES",
-                                                "range": [
-                                                    1,
-                                                    32
-                                                ],
+                                                "range": null,
                                                 "title": "Max GATT Server Profiles",
                                                 "type": "int"
                                             },
@@ -3828,10 +3813,7 @@
                                                 "help": "The number of attempts to reconnect if the connection establishment failed",
                                                 "id": "BT_GATTC_CONNECT_RETRY_COUNT",
                                                 "name": "BT_GATTC_CONNECT_RETRY_COUNT",
-                                                "range": [
-                                                    0,
-                                                    7
-                                                ],
+                                                "range": null,
                                                 "title": "The number of attempts to reconnect if the connection establishment failed",
                                                 "type": "int"
                                             }
@@ -5788,10 +5770,7 @@
                                 "help": "Maximum BT/BLE connection count",
                                 "id": "BT_ACL_CONNECTIONS",
                                 "name": "BT_ACL_CONNECTIONS",
-                                "range": [
-                                    1,
-                                    7
-                                ],
+                                "range": null,
                                 "title": "BT/BLE MAX ACL CONNECTIONS(1~7)",
                                 "type": "int"
                             },
@@ -5861,10 +5840,7 @@
                                 "help": "Bluetooth Connection establishment maximum time, if connection time exceeds this value, the connection\nestablishment fails, ESP_GATTC_OPEN_EVT or ESP_GATTS_OPEN_EVT is triggered.",
                                 "id": "BT_BLE_ESTAB_LINK_CONN_TOUT",
                                 "name": "BT_BLE_ESTAB_LINK_CONN_TOUT",
-                                "range": [
-                                    1,
-                                    60
-                                ],
+                                "range": null,
                                 "title": "Timeout of BLE connection establishment",
                                 "type": "int"
                             },
@@ -11580,7 +11556,7 @@
                         "name": "ESP_CONSOLE_UART_BAUDRATE",
                         "range": [
                             1200,
-                            1000000
+                            4000000
                         ],
                         "title": "UART console baud rate",
                         "type": "int"
@@ -15154,7 +15130,7 @@
                         "id": "LWIP_TCPIP_TASK_STACK_SIZE",
                         "name": "LWIP_TCPIP_TASK_STACK_SIZE",
                         "range": [
-                            2560,
+                            2048,
                             65536
                         ],
                         "title": "TCP/IP Task Stack Size",

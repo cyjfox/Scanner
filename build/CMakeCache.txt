@@ -15,10 +15,7 @@
 ########################
 
 //No help, variable specified on the command line.
-CCACHE_ENABLE:UNINITIALIZED=1
-
-//Path to a program.
-CCACHE_FOUND:FILEPATH=C:/Espressif/tools/ccache/4.3/ccache-4.3-windows-64/ccache.exe
+CCACHE_ENABLE:UNINITIALIZED=0
 
 //Path to a program.
 CMAKE_ADDR2LINE:FILEPATH=C:/Espressif/tools/xtensa-esp32-elf/esp-2021r2-patch3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-addr2line.exe
@@ -305,9 +302,6 @@ __idf_asio_LIB_DEPENDS:STATIC=general;__idf_cxx;general;__idf_newlib;general;__i
 
 //Dependencies for the target
 __idf_bootloader_support_LIB_DEPENDS:STATIC=general;__idf_cxx;general;__idf_newlib;general;__idf_freertos;general;__idf_esp_hw_support;general;__idf_heap;general;__idf_log;general;__idf_lwip;general;__idf_soc;general;__idf_hal;general;__idf_esp_rom;general;__idf_esp_common;general;__idf_esp_system;general;__idf_esp32;
-
-//Dependencies for the target
-__idf_bt_LIB_DEPENDS:STATIC=general;__idf_cxx;general;__idf_newlib;general;__idf_freertos;general;__idf_esp_hw_support;general;__idf_heap;general;__idf_log;general;__idf_lwip;general;__idf_soc;general;__idf_hal;general;__idf_esp_rom;general;__idf_esp_common;general;__idf_esp_system;general;btdm_app;
 
 //Dependencies for the target
 __idf_cbor_LIB_DEPENDS:STATIC=general;__idf_cxx;general;__idf_newlib;general;__idf_freertos;general;__idf_esp_hw_support;general;__idf_heap;general;__idf_log;general;__idf_lwip;general;__idf_soc;general;__idf_hal;general;__idf_esp_rom;general;__idf_esp_common;general;__idf_esp_system;
@@ -700,12 +694,12 @@ C_COMPILER_SUPPORTS_WFORMAT_SIGNEDNESS:INTERNAL=1
 //Details about finding Git
 FIND_PACKAGE_MESSAGE_DETAILS_Git:INTERNAL=[C:/Espressif/tools/idf-git/2.30.1/cmd/git.exe][v2.30.1.windows.1()]
 //Details about finding Python3
-FIND_PACKAGE_MESSAGE_DETAILS_Python3:INTERNAL=[C:/Espressif/python_env/idf4.4_py3.8_env/Scripts/python.exe][cfound components: Interpreter ][v3.8.7()]
+FIND_PACKAGE_MESSAGE_DETAILS_Python3:INTERNAL=[C:/Program Files (x86)/Microsoft Visual Studio/Shared/Python39_64/python.exe][cfound components: Interpreter ][v3.9.7()]
 //ADVANCED property for variable: GIT_EXECUTABLE
 GIT_EXECUTABLE-ADVANCED:INTERNAL=1
 //Path to a program.
-_Python3_EXECUTABLE:INTERNAL=C:/Espressif/python_env/idf4.4_py3.8_env/Scripts/python.exe
+_Python3_EXECUTABLE:INTERNAL=C:/Program Files (x86)/Microsoft Visual Studio/Shared/Python39_64/python.exe
 //Python3 Properties
-_Python3_INTERPRETER_PROPERTIES:INTERNAL=Python;3;8;7;32;;;C:\Espressif\tools\idf-python\3.8.7\Lib;C:\Espressif\tools\idf-python\3.8.7\Lib;C:\Espressif\python_env\idf4.4_py3.8_env\Lib\site-packages;C:\Espressif\python_env\idf4.4_py3.8_env\Lib\site-packages
-_Python3_INTERPRETER_SIGNATURE:INTERNAL=48f6b9d0141245f62183a02efd8ad5dd
+_Python3_INTERPRETER_PROPERTIES:INTERNAL=Python;3;9;7;32;;;C:\Program Files (x86)\Microsoft Visual Studio\Shared\Python39_64\Lib;C:\Program Files (x86)\Microsoft Visual Studio\Shared\Python39_64\Lib;C:\Program Files (x86)\Microsoft Visual Studio\Shared\Python39_64\Lib\site-packages;C:\Program Files (x86)\Microsoft Visual Studio\Shared\Python39_64\Lib\site-packages
+_Python3_INTERPRETER_SIGNATURE:INTERNAL=fe3c6a0ce0e72b1077732a115f0ae393
 
