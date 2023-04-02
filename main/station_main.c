@@ -25,6 +25,8 @@
 #include "signal_generator.h"
 #include "esp_clk.h"
 #include "esp32_golbal.h"
+#include "wifi_control_center.h"
+
 //include "esp_blufi_api.h"
 /* The examples use WiFi configuration that you can set via project configuration menu
 
@@ -476,10 +478,10 @@ void app_main(void)
     //vTaskStartScheduler();
     TaskHandle_t monitorTaskHandle = NULL;
     //UBaseType_t maxStack = 8192;
-    xTaskCreate(monitorTask, "MonitorTask", maxStack, NULL, 2, &monitorTaskHandle); 
+    //xTaskCreate(monitorTask, "MonitorTask", maxStack, NULL, 2, &monitorTaskHandle); 
     uint8_t count_per_min = 60;
-
-    signal_start(DAC_CHANNEL_1, 5, 0.0, 0.0, 0.8, count_per_min / 60, &ecgAmplitudeTable);
+    //signal_start(DAC_CHANNEL_1, 5, 0.0, 0.0, 0.8, count_per_min / 60, &ecgAmplitudeTable);
+    searchServer();
     /*
     while (true) {
         vTaskGetRunTimeStats((char *)&globalBuf);
