@@ -16,8 +16,40 @@ extern esp_netif_ip_info_t ipInfo;
 //static const char *TAG = "wifi control center";
 char deviceName[32] = "My first scanner";
 
+opCode startWifiControlCenter() {
+    uint32_t stackSize = 8192;
+    BaseType_t xReturn;
+    xReturn = xTaskCreatePinnedToCore(wifiControlCenterTask, "wifi_control_center_task", stackSize, NULL, 10, NULL, 1);
+    if (xReturn == pdPASS) {
+        printf("wifi control center successfully started!\n");
+        return opSucceed;
+    } else {
+        printf("start wifi control center failed!\n");
+        return opFailed;
+    }
+}
 
-opCode searchServer() {
+void wifiControlCenterTask(void *parameter) {
+    /*
+    if (parameter == NULL) {
+        printf("wifi control center cannot get server info!gona close wifi cotrol center!\n");
+        return;
+    }
+    */
+    //ServerInfo *pServerInfo = (struct SererInfo *)parameter;
+    struct ServerInfo serverInfo;
+    while (true) {
+          searchServer(&serverInfo);  
+    }
+}
+
+opCode getServerInfo(char *data, int len, struct ServerInfo *pServerInfo) {
+    opCode opReuslt = opSucceed;
+
+    return opResult;
+}
+
+opCode searchServer(const struct ServerInfo *pServerInfo) {
     int result;
     int udpSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (udpSocket < 0) {
@@ -107,6 +139,7 @@ opCode searchServer() {
                                 //IP2STR((ip4_addr_t *)&serverAddr.sin_addr.s_addr)
                                 //printf("receive data : %s, length : %d, server ip : %s\n", recvBuf, len, inet_ntoa(serverAddr.sin_addr.s_addr));
                             printf("receive data : %s, length : %d, server ip : %s\n", recvBuf, recvLen, inet_ntoa(serverAddr.sin_addr.s_addr));
+                            getServerInfo(recvBuf, recvLen, pServerInfo);
                         }
                     }
                 }
