@@ -16,7 +16,7 @@ extern esp_netif_ip_info_t ipInfo;
 //static const char *TAG = "wifi control center";
 char deviceName[32] = "My first scanner";
 
-opCode startWifiControlCenter() {
+OpCode startWifiControlCenter() {
     uint32_t stackSize = 8192;
     BaseType_t xReturn;
     xReturn = xTaskCreatePinnedToCore(wifiControlCenterTask, "wifi_control_center_task", stackSize, NULL, 10, NULL, 1);
@@ -38,18 +38,74 @@ void wifiControlCenterTask(void *parameter) {
     */
     //ServerInfo *pServerInfo = (struct SererInfo *)parameter;
     struct ServerInfo serverInfo;
+    OpCode opResult;
+    int result;
+    char recvBuf[1024];
     while (true) {
-          searchServer(&serverInfo);  
+        opResult = searchServer(&serverInfo);
+        if (opResult != opSucceed) {
+            vTaskDelay(5);
+            continue;
+        }
+
+        int tcpSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+        if (tcpSocket < 0) {
+            printf("create tcp socket failed");
+            close(tcpSocket);
+            vTaskDelay(5);
+            continue;
+        }
+
+        struct sockaddr_in localAddr;
+        bzero(&localAddr, sizeof(struct sockaddr_in));
+        localAddr.sin_family = AF_INET;
+        localAddr.sin_port = htons(LOCAL_TCP_PORT);
+        localAddr.sin_addr.s_addr = *(unsigned int *)&ipInfo.ip;
+        result = bind(tcpSocket, &localAddr, sizeof(struct sockaddr_in));
+        if (result < 0) {
+            printf("tcp socket bind to port failed!please check if it is used!\n");
+            close(tcpSocket);
+            vTaskDelay(5);
+            continue;
+        }
+        
+        struct sockaddr_in serverAddr;
+        serverAddr.sin_family = AF_INET; 
+        serverAddr.sin_port = htons(serverInfo.port);    //服务器端口
+        //serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");  //服务器ip， inet_addr用于IPv4的IP转换(十进制转换为二进制)
+        serverAddr.sin_addr.s_addr = serverInfo.ip;
+        //连接服务器， 成功返回0， 错误返回 -1
+        result = connect(tcpSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr));
+        if (result < 0) {
+            printf("connent to server failed!\n");
+            close(tcpSocket);
+            vTaskDelay(5);
+            continue;
+        }
+        int recvLen;
+        while (true) {
+            recvLen = recv(tcpSocket, recvBuf, sizeof(recvBuf), 0);
+            if (recvLen < 0) {
+                printf("receive command from server got error!\n");
+                continue;
+            }
+
+            printf("command from server got!\n");
+            printf("command : %s, length : %d\n", recvBuf, recvLen);
+
+        }
+        
+
     }
 }
 
-opCode getServerInfo(char *data, int len, struct ServerInfo *pServerInfo) {
-    opCode opReuslt = opSucceed;
+OpCode getServerInfo(char *data, int len, struct ServerInfo *pServerInfo) {
+    OpCode opResult = opSucceed;
 
     return opResult;
 }
 
-opCode searchServer(const struct ServerInfo *pServerInfo) {
+OpCode searchServer(const struct ServerInfo *pServerInfo) {
     int result;
     int udpSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (udpSocket < 0) {
@@ -139,7 +195,13 @@ opCode searchServer(const struct ServerInfo *pServerInfo) {
                                 //IP2STR((ip4_addr_t *)&serverAddr.sin_addr.s_addr)
                                 //printf("receive data : %s, length : %d, server ip : %s\n", recvBuf, len, inet_ntoa(serverAddr.sin_addr.s_addr));
                             printf("receive data : %s, length : %d, server ip : %s\n", recvBuf, recvLen, inet_ntoa(serverAddr.sin_addr.s_addr));
-                            getServerInfo(recvBuf, recvLen, pServerInfo);
+                            if (getServerInfo(recvBuf, recvLen, pServerInfo) == opSucceed) {
+                                close(udpSocket);
+                                return opSucceed;
+                            } else {
+                                //close(udpSocket);
+                                continue;
+                            }
                         }
                     }
                 }
@@ -147,4 +209,7 @@ opCode searchServer(const struct ServerInfo *pServerInfo) {
         }
     }
 }
- 
+
+OpCode parseCommand(char *pData, int32_t len, struct CommandInfo *pCommandInfo) {
+    return opSucceed;
+}

@@ -236,11 +236,7 @@ void monitorTask(void * parameter) {
 
 //#define SERVER_LISTEN_UDP_PORT 48235
 //#define LOCAL_UDP_PORT 48230
-#define SERVER_LISTEN_UDP_PORT 1028
-#define LOCAL_UDP_PORT 1027
-#define SERVER_LISTEN_TCP_PORT 1026
-#define LOCAL_TCP_PORT 1025
-#define MAX_UDP_CONNECT_RETRY 100
+
 void controllerTask(void * parameter) {
     const char * TAG = "controllerTask";
     int len = 0;
@@ -479,9 +475,10 @@ void app_main(void)
     TaskHandle_t monitorTaskHandle = NULL;
     //UBaseType_t maxStack = 8192;
     //xTaskCreate(monitorTask, "MonitorTask", maxStack, NULL, 2, &monitorTaskHandle); 
-    uint8_t count_per_min = 60;
-    //signal_start(DAC_CHANNEL_1, 5, 0.0, 0.0, 0.8, count_per_min / 60, &ecgAmplitudeTable);
-    searchServer();
+    double count_per_min = 80;
+    signal_start(DAC_CHANNEL_1, 5, 0.0, 0.0, 0.8, count_per_min / 60.0, &ecgAmplitudeTable);
+    struct ServerInfo serverInfo;
+    searchServer(&serverInfo);
     /*
     while (true) {
         vTaskGetRunTimeStats((char *)&globalBuf);

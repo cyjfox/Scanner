@@ -1766,7 +1766,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "Scanner.elf::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-Scanner.elf-Debug-e59a67f2550a836f75ee.json",
+					"jsonFile" : "target-Scanner.elf-Debug-64d703f96c1dce6c2145.json",
 					"name" : "Scanner.elf",
 					"projectIndex" : 0
 				},
@@ -1780,7 +1780,7 @@
 				{
 					"directoryIndex" : 15,
 					"id" : "__idf_app_update::@cc3b426666063acc9674",
-					"jsonFile" : "target-__idf_app_update-Debug-efd8e746b7b8194c42ac.json",
+					"jsonFile" : "target-__idf_app_update-Debug-a1ca886f9be620dee443.json",
 					"name" : "__idf_app_update",
 					"projectIndex" : 1
 				},
@@ -1941,7 +1941,7 @@
 				{
 					"directoryIndex" : 73,
 					"id" : "__idf_esp_local_ctrl::@d6aad58d2946e56208ef",
-					"jsonFile" : "target-__idf_esp_local_ctrl-Debug-28bb2e3b64efd60526ca.json",
+					"jsonFile" : "target-__idf_esp_local_ctrl-Debug-93f069ab87f91a2f9b5f.json",
 					"name" : "__idf_esp_local_ctrl",
 					"projectIndex" : 1
 				},
@@ -2102,7 +2102,7 @@
 				{
 					"directoryIndex" : 93,
 					"id" : "__idf_main::@7368607ed66887415643",
-					"jsonFile" : "target-__idf_main-Debug-e7a5888dea363338eacb.json",
+					"jsonFile" : "target-__idf_main-Debug-65e1908ee29efe33dec9.json",
 					"name" : "__idf_main",
 					"projectIndex" : 1
 				},
@@ -2256,7 +2256,7 @@
 				{
 					"directoryIndex" : 92,
 					"id" : "__idf_wifi_provisioning::@9d7e7ffe1b15746c1098",
-					"jsonFile" : "target-__idf_wifi_provisioning-Debug-9236b5d5f1ca872f7e85.json",
+					"jsonFile" : "target-__idf_wifi_provisioning-Debug-1e2b814cf8fec3d0246f.json",
 					"name" : "__idf_wifi_provisioning",
 					"projectIndex" : 1
 				},
@@ -2277,7 +2277,7 @@
 				{
 					"directoryIndex" : 23,
 					"id" : "__ldgen_output_sections.ld::@874df54e61e20112dfd4",
-					"jsonFile" : "target-__ldgen_output_sections.ld-Debug-aff3ae0e7b60b2b94e30.json",
+					"jsonFile" : "target-__ldgen_output_sections.ld-Debug-e16143e6f20e5cc196cf.json",
 					"name" : "__ldgen_output_sections.ld",
 					"projectIndex" : 1
 				},

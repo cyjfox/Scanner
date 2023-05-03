@@ -94,19 +94,21 @@ uint8_t level = 0;
 void IRAM_ATTR timer_update_dac(void *arg) {
     //printf("interupted!\n");
     //dac_output_voltage(current_channel, current_amp);
-    /*
+    
     dac_output_voltage(current_channel, current_amp);
     timer_group_clr_intr_status_in_isr(TIMER_GROUP_0, TIMER_0);
     
     current_amp = update_amplitude();
     timer_set_alarm_value(TIMER_GROUP_0, TIMER_0, next_alarm_value);
     timer_group_enable_alarm_in_isr(TIMER_GROUP_0, TIMER_0);
-    */
+    
+   /*
     level = ~level;
     gpio_set_level(GPIO_NUM_23, level);
     timer_group_clr_intr_status_in_isr(TIMER_GROUP_0, TIMER_0);
     
     timer_group_enable_alarm_in_isr(TIMER_GROUP_0, TIMER_0);
+    */
     /*
     if (current_amp == 0) {
         current_amp = 127;
@@ -156,7 +158,7 @@ void IRAM_ATTR timer_update_dac(void *arg) {
 esp_err_t signal_start(dac_channel_t channel, uint32_t delay_ms, double phase, double offset, double amplitude, double frequency, double (*pSignal)[1000])
 {
     //esp_err_t signal_start(dac_channel_t channel, uint32_t delay_ms, double phase, double offset, double amplitude, double frequency, DataGenerarotor pPDataGenrator);
-
+/*
     gpio_config_t gpio_cfg = {};
     gpio_cfg.intr_type = GPIO_INTR_DISABLE,
     gpio_cfg.mode = GPIO_MODE_OUTPUT,
@@ -165,7 +167,7 @@ esp_err_t signal_start(dac_channel_t channel, uint32_t delay_ms, double phase, d
     gpio_cfg.pull_up_en = GPIO_PULLUP_ENABLE,
     
     gpio_config(&gpio_cfg);
-
+*/
     ESP_RETURN_ON_FALSE(channel < DAC_CHANNEL_MAX, ESP_ERR_INVALID_ARG, TAG, "DAC channel error");
     current_channel = channel;
     dac_output_enable(current_channel);
